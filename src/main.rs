@@ -3,7 +3,7 @@ use crate::systems::{
     ability, aliens, attack, axes, bullet, camera, debug, drag_selection, drone, health,
     health_numbers, selection, selection_circle, target_indicator, time, ui, unit, walker,
 };
-use bevy::{prelude::*, render::texture::ImagePlugin, log::LogSettings};
+use bevy::{log::LogSettings, prelude::*, render::texture::ImagePlugin};
 use bevy_mod_picking::*;
 
 mod bundles;
@@ -17,8 +17,8 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(WindowDescriptor {
             title: "bavy".to_string(),
-            width: 1600.0,
-            height: 1600.0,
+            width: 800.0,
+            height: 600.0,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)

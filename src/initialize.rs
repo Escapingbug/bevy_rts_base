@@ -43,7 +43,11 @@ pub fn setup(
 
     let walker_mesh = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
     let big_walker_mesh = meshes.add(Mesh::from(shape::Cube { size: 5.0 }));
-    let material = materials.add(Tailwind::RED400.into());
+    let material = materials.add(StandardMaterial {
+        base_color: Tailwind::RED400.into(),
+        unlit: true,
+        ..default()
+    });
     for i in 0..5 {
         for j in 0..5 {
             create_walker(
@@ -58,7 +62,11 @@ pub fn setup(
     create_tp_healer(
         &mut commands,
         big_walker_mesh,
-        materials.add(Tailwind::RED700.into()),
+        materials.add(StandardMaterial {
+            base_color: Tailwind::RED700.into(),
+            unlit: true,
+            ..default()
+        }),
         Vec3::new(20.0, 0.0, 20.0),
     );
 

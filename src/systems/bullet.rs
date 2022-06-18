@@ -96,7 +96,11 @@ impl FromWorld for BulletMeshResource {
         let material = world
             .get_resource_mut::<Assets<StandardMaterial>>()
             .unwrap()
-            .add(Tailwind::BLACK.into());
+            .add(StandardMaterial {
+                base_color: Tailwind::BLACK.into(),
+                unlit: true,
+                ..default()
+            });
         BulletMeshResource { mesh, material }
     }
 }

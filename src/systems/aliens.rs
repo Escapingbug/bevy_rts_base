@@ -54,7 +54,11 @@ impl FromWorld for AlienMeshResource {
         let material = world
             .get_resource_mut::<Assets<StandardMaterial>>()
             .unwrap()
-            .add(Tailwind::PURPLE400.into());
+            .add(StandardMaterial {
+                base_color: Tailwind::PURPLE400.into(),
+                unlit: true,
+                ..default()
+            });
         AlienMeshResource { mesh, material }
     }
 }

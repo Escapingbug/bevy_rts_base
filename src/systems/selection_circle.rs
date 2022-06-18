@@ -69,7 +69,7 @@ fn change_circle_color(
     mut query: Query<(
         &SelectionCircle,
         &mut Visibility,
-        &mut Handle<ColorMaterial>,
+        &mut Handle<StandardMaterial>,
     )>,
 ) {
     for (circle, mut draw, mut material) in query.iter_mut() {
@@ -82,24 +82,45 @@ fn change_circle_color(
         };
 
         draw.is_visible = circle.visible();
+        if draw.is_visible {
+            info!("change circle color");
+        }
     }
 }
 
 pub struct SelectionCircleMaterial {
     pub circle_mesh: Handle<Mesh>,
-    pub circle_material: Handle<ColorMaterial>,
-    pub selected_material: Handle<ColorMaterial>,
-    pub hover_material: Handle<ColorMaterial>,
-    pub highlighted_material: Handle<ColorMaterial>,
+    pub circle_material: Handle<StandardMaterial>,
+    pub selected_material: Handle<StandardMaterial>,
+    pub hover_material: Handle<StandardMaterial>,
+    pub highlighted_material: Handle<StandardMaterial>,
 }
 
 impl FromWorld for SelectionCircleMaterial {
     fn from_world(world: &mut World) -> Self {
-        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
-        let circle_material = materials.add(Tailwind::BLUE500.into());
-        let selected_material = materials.add(Tailwind::BLUE500.into());
-        let hover_material = materials.add(Tailwind::BLUE300.into());
-        let highlighted_material = materials.add(Tailwind::YELLOW300.into());
+        let mut materials = world
+            .get_resource_mut::<Assets<StandardMaterial>>()
+            .unwrap();
+        let circle_material = materials.add(StandardMaterial {
+            base_color: Tailwind::BLUE500.into(),
+            unlit: true,
+            ..default()
+        });
+        let selected_material = materials.add(StandardMaterial {
+            base_color: Tailwind::BLUE500.into(),
+            unlit: true,
+            ..default()
+        });
+        let hover_material = materials.add(StandardMaterial {
+            base_color: Tailwind::BLUE300.into(),
+            unlit: true,
+            ..default()
+        });
+        let highlighted_material = materials.add(StandardMaterial {
+            base_color: Tailwind::YELLOW300.into(),
+            unlit: true,
+            ..default()
+        });
         let mut meshes = world.get_resource_mut::<Assets<Mesh>>().unwrap();
         let circle_mesh = meshes.add(circle_mesh());
         SelectionCircleMaterial {

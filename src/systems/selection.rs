@@ -1,12 +1,9 @@
-use crate::{
-    colors::Tailwind,
-    systems::{
-        ability::*,
-        selection_circle::*,
-        unit::{TargetPosition, UnitSize},
-    },
+use crate::systems::{
+    ability::*,
+    selection_circle::*,
+    unit::{TargetPosition, UnitSize},
 };
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 use bevy_mod_picking::*;
 
 #[derive(Component)]
@@ -33,23 +30,15 @@ fn selectable_builder(
 ) {
     for (entity, _, size) in &mut query.iter() {
         let circle = commands
-            .spawn_bundle(SpriteBundle {
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(1.0, 1.0)),
-                    color: Tailwind::BLUE500.into(),
-                    ..Default::default()
-                },
-                visibility: Visibility { is_visible: false },
+            .spawn_bundle(PbrBundle {
+                material: resource.circle_material.clone(),
+                mesh: resource.circle_mesh.clone().into(),
                 transform: Transform {
                     translation: Vec3::new(0.0, 0.1, 0.0),
                     scale: Vec3::splat(0.03 * size.0),
                     ..Default::default()
                 },
-                ..Default::default()
-            })
-            .insert_bundle(MaterialMesh2dBundle {
-                material: resource.circle_material.clone(),
-                mesh: resource.circle_mesh.clone().into(),
+                visibility: Visibility { is_visible: false },
                 ..default()
             })
             .insert(SelectionCircle::default())
