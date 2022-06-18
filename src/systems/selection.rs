@@ -1,8 +1,11 @@
-use crate::{systems::{
-    ability::*,
-    selection_circle::*,
-    unit::{TargetPosition, UnitSize},
-}, colors::Tailwind};
+use crate::{
+    colors::Tailwind,
+    systems::{
+        ability::*,
+        selection_circle::*,
+        unit::{TargetPosition, UnitSize},
+    },
+};
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_mod_picking::*;
 

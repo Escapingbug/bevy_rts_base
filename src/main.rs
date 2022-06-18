@@ -3,7 +3,7 @@ use crate::systems::{
     ability, aliens, attack, axes, bullet, camera, debug, drag_selection, drone, health,
     health_numbers, selection, selection_circle, target_indicator, time, ui, unit, walker,
 };
-use bevy::{prelude::*, render::texture::ImagePlugin};
+use bevy::{prelude::*, render::texture::ImagePlugin, log::LogSettings};
 use bevy_mod_picking::*;
 
 mod bundles;
@@ -23,7 +23,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(ImagePlugin)
-        // .add_plugin(debug::DebugPlugin)
+        //.add_plugin(debug::DebugPlugin)
         .add_plugin(time::TimePlugin)
         .add_plugin(PickingPlugin)
         .add_plugin(InteractablePickingPlugin)

@@ -86,7 +86,10 @@ pub struct BulletMeshResource {
 
 impl FromWorld for BulletMeshResource {
     fn from_world(world: &mut World) -> Self {
-        let mesh = world.get_resource_mut::<Assets<Mesh>>().unwrap().add(Mesh::from(shape::Icosphere {
+        let mesh = world
+            .get_resource_mut::<Assets<Mesh>>()
+            .unwrap()
+            .add(Mesh::from(shape::Icosphere {
                 subdivisions: 4,
                 radius: 0.3,
             }));
@@ -94,10 +97,7 @@ impl FromWorld for BulletMeshResource {
             .get_resource_mut::<Assets<StandardMaterial>>()
             .unwrap()
             .add(Tailwind::BLACK.into());
-        BulletMeshResource {
-            mesh,
-            material,
-        }
+        BulletMeshResource { mesh, material }
     }
 }
 

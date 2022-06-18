@@ -21,25 +21,25 @@ pub fn setup(
         // plane
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Plane { size: 400.0 })),
-            material: materials.add(StandardMaterial { base_color: Color::GRAY, ..default() }),
+            material: materials.add(StandardMaterial {
+                base_color: Color::GRAY,
+                ..default()
+            }),
             ..Default::default()
         })
         .insert_bundle(PickableBundle::default());
     // light
-    commands
-        .spawn_bundle(PointLightBundle {
-            transform: Transform::from_translation(Vec3::new(4.0, 8.0, 4.0)),
-            point_light: PointLight {
-                intensity: 60000.0,
-                range: 100.0,
-                radius: 10000.0,
-                ..default()
-            },
-            ..Default::default()
-        });
-    commands
-        .spawn()
-        .insert(CameraUi::default());
+    commands.spawn_bundle(PointLightBundle {
+        transform: Transform::from_translation(Vec3::new(4.0, 8.0, 4.0)),
+        point_light: PointLight {
+            intensity: 60000.0,
+            range: 100.0,
+            radius: 10000.0,
+            ..default()
+        },
+        ..Default::default()
+    });
+    commands.spawn().insert(CameraUi::default());
 
     let walker_mesh = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
     let big_walker_mesh = meshes.add(Mesh::from(shape::Cube { size: 5.0 }));
