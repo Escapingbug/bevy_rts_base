@@ -2,14 +2,14 @@ use crate::colors::Tailwind;
 use crate::systems::{faction::*, health::Health, time::*, unit::*};
 use bevy::{math::Vec3, prelude::*};
 
-const BULLET_SPEED: f32 = 30.;
+const BULLET_SPEED: f32 = 3.;
 // Seconds before the bullet is despawned
 const BULLET_LIFETIME: f64 = 10.;
 
 #[derive(Component)]
 pub struct Bullet {
-    pub direction: Vec3,
-    pub should_despawn_at: f64,
+    /// The entity that this bullet towards
+    pub towards: Entity,
 }
 impl Bullet {
     pub fn spawn(
@@ -17,7 +17,7 @@ impl Bullet {
         resource: &BulletMeshResource,
         seconds_since_startup: f64,
         origin: Vec3,
-        direction: Vec3,
+        towards: Entity,
         faction: Factions,
     ) {
         commands
@@ -27,20 +27,30 @@ impl Bullet {
                 transform: Transform::from_translation(origin),
                 ..Default::default()
             })
-            .insert(Bullet {
-                direction,
-                should_despawn_at: seconds_since_startup + BULLET_LIFETIME,
-            })
+            .insert(Bullet { towards })
             .insert(Faction::new(faction));
     }
 }
 
-fn move_bullet(time: Res<ControlledTime>, mut query: Query<(&Bullet, &mut Transform)>) {
-    for (bullet, mut transform) in query.iter_mut() {
-        transform.translation += BULLET_SPEED * bullet.direction * time.delta_seconds;
+fn move_bullet(
+    mut commands: Commands,
+    time: Res<ControlledTime>,
+    mut query: Query<(&Bullet, &mut Transform, Entity)>,
+    target_query: Query<&Transform, Without<Bullet>>,
+) {
+    for (bullet, mut transform, bullet_entity) in query.iter_mut() {
+        let target_transform = target_query.get(bullet.towards);
+        if let Ok(target_transform) = target_transform {
+            let direction = target_transform.translation - transform.translation;
+            transform.translation += BULLET_SPEED * direction * time.delta_seconds;
+        } else {
+            // target dies but bullet hasn't arrived, remove the bullet
+            commands.entity(bullet_entity).despawn();
+        }
     }
 }
 
+/*
 fn kill_after_lifetime_over(
     mut commands: Commands,
     time: Res<ControlledTime>,
@@ -52,6 +62,7 @@ fn kill_after_lifetime_over(
         }
     }
 }
+*/
 
 fn bullet_collision(
     mut commands: Commands,
@@ -110,7 +121,7 @@ impl Plugin for BulletPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<BulletMeshResource>()
             .add_system(move_bullet)
-            .add_system(kill_after_lifetime_over)
+            //.add_system(kill_after_lifetime_over)
             .add_system(bullet_collision);
     }
 }

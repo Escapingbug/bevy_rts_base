@@ -27,24 +27,24 @@ fn shoot_against_enemies(
     mut commands: Commands,
     time: Res<ControlledTime>,
     bullet_resource: Res<BulletMeshResource>,
-    mut ranged_query: Query<(&Unit, &mut Ranged, &Transform, &Faction)>,
+    mut ranged_query: Query<(Entity, &Unit, &mut Ranged, &Transform, &Faction)>,
     // This other query is so we also get all the units that aren't ranged
-    others_query: Query<(&Unit, &Transform, &Faction)>,
+    others_query: Query<(Entity, &Unit, &Transform, &Faction)>,
 ) {
     let mut unit_positions = Vec::new();
-    for (_, _, transform, faction) in ranged_query.iter_mut() {
-        unit_positions.push((transform.translation, faction.faction));
+    for (entity, _, _, transform, faction) in ranged_query.iter_mut() {
+        unit_positions.push((entity, transform.translation, faction.faction));
     }
-    for (_, transform, faction) in others_query.iter() {
-        unit_positions.push((transform.translation, faction.faction));
+    for (entity, _, transform, faction) in others_query.iter() {
+        unit_positions.push((entity, transform.translation, faction.faction));
     }
 
-    for (_, mut ranged, transform, faction) in ranged_query.iter_mut() {
+    for (_, _, mut ranged, transform, faction) in ranged_query.iter_mut() {
         let translation = transform.translation;
         if ranged.can_shoot(time.seconds_since_startup) {
             // Get the closest enemy
-            let mut enemy: Option<(Vec3, f32)> = None; // Option with (difference_vector, difference_distance)
-            for (enemy_transform, enemy_faction) in &unit_positions {
+            let mut enemy: Option<(Vec3, f32, Entity)> = None; // Option with (difference_vector, difference_distance, enemy_entity)
+            for (enemy_entity, enemy_transform, enemy_faction) in &unit_positions {
                 // Skip units in same faction
                 if *enemy_faction == faction.faction {
                     continue;
@@ -55,24 +55,24 @@ fn shoot_against_enemies(
 
                 // If it's in range, we check if it's closer or the first enemy
                 if difference_distance < ranged.range {
-                    if let Some((_, distance)) = enemy {
+                    if let Some((_, distance, _)) = enemy {
                         if difference_distance < distance {
-                            enemy = Some((difference, difference_distance));
+                            enemy = Some((difference, difference_distance, *enemy_entity));
                         }
                     } else {
-                        enemy = Some((difference, difference_distance));
+                        enemy = Some((difference, difference_distance, *enemy_entity));
                     }
                 }
             }
 
             // If there is a closest enemy, we shoot
-            if let Some((vector, _)) = enemy {
+            if let Some((_, _, enemy_entity)) = enemy {
                 Bullet::spawn(
                     &mut commands,
                     &bullet_resource,
                     time.seconds_since_startup,
                     translation,
-                    -vector.normalize(),
+                    enemy_entity,
                     faction.faction,
                 );
 

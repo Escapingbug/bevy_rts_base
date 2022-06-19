@@ -82,9 +82,6 @@ fn change_circle_color(
         };
 
         draw.is_visible = circle.visible();
-        if draw.is_visible {
-            info!("change circle color");
-        }
     }
 }
 
