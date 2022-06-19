@@ -70,7 +70,6 @@ fn shoot_against_enemies(
                 Bullet::spawn(
                     &mut commands,
                     &bullet_resource,
-                    time.seconds_since_startup,
                     translation,
                     enemy_entity,
                     faction.faction,

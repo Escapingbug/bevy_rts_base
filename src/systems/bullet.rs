@@ -2,9 +2,7 @@ use crate::colors::Tailwind;
 use crate::systems::{faction::*, health::Health, time::*, unit::*};
 use bevy::{math::Vec3, prelude::*};
 
-const BULLET_SPEED: f32 = 3.;
-// Seconds before the bullet is despawned
-const BULLET_LIFETIME: f64 = 10.;
+const BULLET_SPEED: f32 = 30.;
 
 #[derive(Component)]
 pub struct Bullet {
@@ -15,7 +13,6 @@ impl Bullet {
     pub fn spawn(
         commands: &mut Commands,
         resource: &BulletMeshResource,
-        seconds_since_startup: f64,
         origin: Vec3,
         towards: Entity,
         faction: Factions,
@@ -41,7 +38,7 @@ fn move_bullet(
     for (bullet, mut transform, bullet_entity) in query.iter_mut() {
         let target_transform = target_query.get(bullet.towards);
         if let Ok(target_transform) = target_transform {
-            let direction = target_transform.translation - transform.translation;
+            let direction = (target_transform.translation - transform.translation).normalize();
             transform.translation += BULLET_SPEED * direction * time.delta_seconds;
         } else {
             // target dies but bullet hasn't arrived, remove the bullet
