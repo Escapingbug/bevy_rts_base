@@ -3,7 +3,7 @@ use crate::systems::{
     ability, aliens, attack, axes, bullet, camera, debug, drag_selection, drone, health,
     health_numbers, selection, selection_circle, target_indicator, time, ui, unit, walker,
 };
-use bevy::{log::LogSettings, prelude::*, render::texture::ImagePlugin};
+use bevy::{prelude::*, render::texture::ImagePlugin};
 use bevy_mod_picking::*;
 
 mod bundles;

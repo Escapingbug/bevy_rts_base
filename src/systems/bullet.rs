@@ -8,7 +8,10 @@ const BULLET_SPEED: f32 = 30.;
 pub struct Bullet {
     /// The entity that this bullet towards
     pub towards: Entity,
+    /// When entity dies, the bullet then goes to this position
+    pub last_towards: Option<Vec3>,
 }
+
 impl Bullet {
     pub fn spawn(
         commands: &mut Commands,
@@ -24,7 +27,7 @@ impl Bullet {
                 transform: Transform::from_translation(origin),
                 ..Default::default()
             })
-            .insert(Bullet { towards })
+            .insert(Bullet { towards, last_towards: None })
             .insert(Faction::new(faction));
     }
 }
@@ -32,17 +35,28 @@ impl Bullet {
 fn move_bullet(
     mut commands: Commands,
     time: Res<ControlledTime>,
-    mut query: Query<(&Bullet, &mut Transform, Entity)>,
+    mut query: Query<(&mut Bullet, &mut Transform, Entity)>,
     target_query: Query<&Transform, Without<Bullet>>,
 ) {
-    for (bullet, mut transform, bullet_entity) in query.iter_mut() {
+    for (mut bullet, mut transform, bullet_entity) in query.iter_mut() {
         let target_transform = target_query.get(bullet.towards);
         if let Ok(target_transform) = target_transform {
             let direction = (target_transform.translation - transform.translation).normalize();
             transform.translation += BULLET_SPEED * direction * time.delta_seconds;
+            bullet.last_towards = Some(target_transform.translation);
         } else {
-            // target dies but bullet hasn't arrived, remove the bullet
-            commands.entity(bullet_entity).despawn();
+            // target dies, go to our recorded final position
+            if let Some(target_position) = bullet.last_towards {
+                if (transform.translation - target_position).length() < 1.0 {
+                    commands.entity(bullet_entity).despawn();
+                } else {
+                    let direction = (target_position - transform.translation).normalize();
+                    transform.translation += BULLET_SPEED * direction * time.delta_seconds;
+                }
+            } else {
+                // got no recorded (maybe not out, remove it)
+                commands.entity(bullet_entity).despawn();
+            }
         }
     }
 }
